@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
-import usersApi, { UserDTO } from "@/services/api/resources/users";
+import usersApi from "@/services/api/resources/users";
+import { User } from "@/types/api";
 import { WaitKey } from "@/constants";
 
 interface Account {
@@ -7,34 +8,49 @@ interface Account {
   name: string;
 }
 
-export const useAccountStore = defineStore("account", {
-  state: () => ({
-    accountId: "",
-    name: "",
-    users: [] as UserDTO[],
-  }),
+interface AccountState {
+  currentAccount: Account | null;
+  usersList: User[];
+  usersListPage: number;
+  usersListTotalPages: number;
+  usersListTotal: number;
+}
 
-  getters: {
-    currentAccount: (state): Account => ({
-      id: state.accountId,
-      name: state.name,
-    }),
-    accountUsers: (state): UserDTO[] => state.users,
-  },
+export const useAccountStore = defineStore("account", {
+  state: (): AccountState => ({
+    currentAccount: null,
+    usersList: [],
+    usersListPage: 1,
+    usersListTotalPages: 1,
+    usersListTotal: 0,
+  }),
 
   actions: {
     async setAccount(account: Account) {
-      this.accountId = account.id;
-      this.name = account.name;
+      this.currentAccount = account;
+      this.usersList = [];
+      this.usersListPage = 1;
+      await this.fetchUsersPage(1);
+    },
 
+    async fetchUsersPage(page: number) {
       try {
         this.$wait.start(WaitKey.FETCH_USERS);
-        this.users = await usersApi.getUsers();
+        const response = await usersApi.getUsers(page);
+        this.usersList = response.data;
+        this.usersListTotalPages = response.total_pages;
+        this.usersListTotal = response.total;
+        this.usersListPage = response.page;
       } catch (error) {
-        console.error("Failed to fetch users:", error);
-        this.users = [];
+        console.error("Error fetching users:", error);
       } finally {
         this.$wait.end(WaitKey.FETCH_USERS);
+      }
+    },
+
+    async setUsersPage(page: number) {
+      if (page > 0 && page <= this.usersListTotalPages) {
+        await this.fetchUsersPage(page);
       }
     },
   },

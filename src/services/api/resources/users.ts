@@ -1,29 +1,11 @@
 import apiClient from "@/services/api/http";
+import { PaginatedUsers } from "@/types/api";
 
-export interface UserDTO {
-  id: number;
-  email: string;
-  first_name: string;
-  last_name: string;
-  avatar: string;
-}
-
-const getUsers = async (): Promise<UserDTO[]> => {
-  const resp = await apiClient.get("users?delay=1");
-  const result = resp.data;
-  const users = result.data;
-  // Randomize the order of users
-  return users.sort(() => Math.random() - 0.5);
+const usersApi = {
+  getUsers: async (page = 1): Promise<PaginatedUsers> => {
+    const response = await apiClient.get(`/users?page=${page}&delay=1`);
+    return response.data;
+  },
 };
 
-const getUser = async (id: string | number): Promise<UserDTO> => {
-  const resp = await apiClient.get(`users/${id}?delay=1`);
-  const result = resp.data;
-  const user = result.data;
-  return user;
-};
-
-export default {
-  getUsers,
-  getUser,
-};
+export default usersApi;

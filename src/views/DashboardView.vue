@@ -21,10 +21,11 @@
       </select>
     </div>
 
-    <div v-if="currentAccount.id" class="bg-white rounded-lg shadow-md p-6">
+    <div v-if="currentAccount?.id" class="bg-white rounded-lg shadow-md p-6">
       <h2 class="text-xl font-semibold mb-4">
         Users for {{ currentAccount.name }}
       </h2>
+      <p class="mb-4">Total: {{ usersListTotal }}</p>
       <div class="overflow-x-auto">
         <v-wait :for="WaitKey.FETCH_USERS">
           <template slot="waiting">
@@ -52,7 +53,7 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <tr
-                v-for="user in accountUsers"
+                v-for="user in usersList"
                 :key="user.id"
                 class="hover:bg-gray-50"
               >
@@ -75,6 +76,26 @@
             </tbody>
           </table>
         </v-wait>
+
+        <!-- Pagination -->
+        <div
+          v-if="usersListTotalPages > 1"
+          class="mt-4 flex justify-center space-x-2"
+        >
+          <button
+            v-for="page in usersListTotalPages"
+            :key="page"
+            @click="handlePageChange(page)"
+            class="px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+            :class="{
+              'bg-blue-600 text-white': page === usersListPage,
+              'bg-gray-200 text-gray-700 hover:bg-gray-300':
+                page !== usersListPage,
+            }"
+          >
+            {{ page }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -110,7 +131,13 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(useAccountStore, ["currentAccount", "accountUsers"]),
+    ...mapState(useAccountStore, [
+      "currentAccount",
+      "usersList",
+      "usersListPage",
+      "usersListTotalPages",
+      "usersListTotal",
+    ]),
 
     WaitKey: () => WaitKey,
 
@@ -125,7 +152,7 @@ export default Vue.extend({
   },
 
   methods: {
-    ...mapActions(useAccountStore, ["setAccount"]),
+    ...mapActions(useAccountStore, ["setAccount", "setUsersPage"]),
 
     async handleAccountChange(): Promise<void> {
       const account = this.availableAccounts.find(
@@ -134,6 +161,10 @@ export default Vue.extend({
       if (account) {
         await this.setAccount(account);
       }
+    },
+
+    async handlePageChange(page: number): Promise<void> {
+      await this.setUsersPage(page);
     },
   },
 });
