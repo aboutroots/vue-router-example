@@ -11,7 +11,7 @@
         />
       </svg>
     </div>
-    <span class="ml-3 text-gray-600">Loading...</span>
+    <span class="ml-3 text-gray-600">{{ text }}</span>
   </div>
 </template>
 
@@ -19,5 +19,11 @@
 import Vue from "vue";
 export default Vue.extend({
   name: "LoadingSpinner",
+  props: {
+    text: {
+      type: String,
+      default: "Loading...",
+    },
+  },
 });
 </script>

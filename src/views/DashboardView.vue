@@ -6,6 +6,7 @@
       >
       <select
         id="account-select"
+        data-test="account-select"
         v-model="selectedAccountId"
         @change="handleAccountChange"
         class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px]"
@@ -15,17 +16,18 @@
           v-for="account in availableAccounts"
           :key="account.id"
           :value="account.id"
+          data-test="account-option"
         >
           {{ account.name }}
         </option>
       </select>
     </div>
 
-    <div v-if="currentAccount?.id" class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-xl font-semibold mb-4">
-        Users for {{ currentAccount.name }}
+    <div v-if="hasCurrentAccount" class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4" data-test="account-heading">
+        Users for {{ currentAccountName }}
       </h2>
-      <p class="mb-4">Total: {{ usersListTotal }}</p>
+      <p class="mb-4" data-test="total-users">Total: {{ usersListTotal }}</p>
       <div class="overflow-x-auto">
         <v-wait :for="WaitKey.FETCH_USERS">
           <template slot="waiting">
@@ -77,7 +79,6 @@
           </table>
         </v-wait>
 
-        <!-- Pagination -->
         <div
           v-if="usersListTotalPages > 1"
           class="mt-4 flex justify-center space-x-2"
@@ -92,6 +93,7 @@
               'bg-gray-200 text-gray-700 hover:bg-gray-300':
                 page !== usersListPage,
             }"
+            data-test="page-button"
           >
             {{ page }}
           </button>
@@ -138,6 +140,21 @@ export default Vue.extend({
       "usersListTotalPages",
       "usersListTotal",
     ]),
+
+    hasCurrentAccount(): boolean {
+      return (
+        this.currentAccount !== null && this.currentAccount.id !== undefined
+      );
+    },
+
+    currentAccountName(): string {
+      return this.currentAccount?.name || "";
+    },
+
+    test() {
+      console.log(this.currentAccount);
+      return "test";
+    },
 
     WaitKey: () => WaitKey,
 
