@@ -1,100 +1,106 @@
 import { mount } from "@vue/test-utils";
 import DashboardView from "@/views/DashboardView.vue";
+import { CreateElement, VNode } from "vue";
 
-const setAccount = jest.fn();
-const setUsersPage = jest.fn();
+// Mock components
+jest.mock("@/components/Dashboard.vue", () => ({
+  name: "DashboardPanel",
+  render: (h: CreateElement): VNode =>
+    h(
+      "div",
+      { attrs: { "data-test": "dashboard-component" } },
+      "Dashboard Component"
+    ),
+}));
 
-const mockUseAccountStore = jest.fn().mockReturnValue({
-  currentAccount: null,
-  usersList: [],
-  usersListPage: 1,
-  usersListTotalPages: 1,
-  usersListTotal: 0,
-  setAccount,
-  setUsersPage,
-});
+jest.mock("@/components/AccountSelector.vue", () => ({
+  name: "AccountSelector",
+  render: (h: CreateElement): VNode =>
+    h(
+      "div",
+      { attrs: { "data-test": "account-selector-component" } },
+      "Account Selector Component"
+    ),
+}));
 
-jest.mock("@/stores/account", () => ({
-  useAccountStore: () => mockUseAccountStore(),
+jest.mock("@/components/ExpandableData.vue", () => ({
+  name: "ExpandableData",
+  render: (h: CreateElement): VNode =>
+    h(
+      "div",
+      { attrs: { "data-test": "expandable-data-component" } },
+      "Expandable Data Component"
+    ),
 }));
 
 describe("DashboardView", () => {
-  // Helper function to create the component with custom options
-  const createWrapper = (
-    options: {
-      data?: Record<string, any>;
-    } = {}
-  ) => {
-    return mount(DashboardView, {
-      data() {
-        return {
-          ...options.data,
-        };
-      },
-      stubs: {
-        LoadingSpinner: {
-          template: "<div>Loading...</div>",
-        },
-        "v-wait": {
-          template: "<div><slot name='waiting'></slot><slot></slot></div>",
-        },
-      },
-    });
+  // Helper function to create the component
+  const createWrapper = () => {
+    return mount(DashboardView);
   };
 
-  test("renders correctly with initial state", async () => {
+  test("renders the Dashboard component", () => {
+    // Arrange
     const wrapper = createWrapper();
-    await wrapper.vm.$nextTick();
-    // Check if account select has correct number of options
-    const accountOptions = wrapper.findAll('[data-test="account-option"]');
-    expect(accountOptions).toHaveLength(3); // 3 accounts
 
-    // Check if first account option has correct text
-    expect(accountOptions.at(0).text().trim()).toBe("Account 1");
-
-    // Check we can click on an account option
-    const accountSelect = wrapper.find('[data-test="account-select"]');
-    await accountSelect.setValue("d1f9f052-62c2-4d72-8c2d-36dc04ad6ba0");
-    await wrapper.vm.$nextTick();
-    expect(setAccount).toHaveBeenCalledTimes(1);
+    // Assert
+    expect(wrapper.find('[data-test="dashboard-component"]').exists()).toBe(
+      true
+    );
+    expect(wrapper.find('[data-test="dashboard-component"]').text()).toBe(
+      "Dashboard Component"
+    );
   });
 
-  test("renders correctly when account is selected", () => {
-    mockUseAccountStore.mockReturnValue({
-      currentAccount: {
-        id: "d1f9f052-62c2-4d72-8c2d-36dc04ad6ba0",
-        name: "Account 1",
-      },
-      usersList: [
-        {
-          id: 1,
-          name: "John Doe",
-        },
-      ],
-      usersListPage: 1,
-      usersListTotalPages: 5,
-      usersListTotal: 5,
-      setAccount,
-      setUsersPage,
-    });
-    const wrapper = createWrapper({
-      data: {
-        selectedAccountId: "d1f9f052-62c2-4d72-8c2d-36dc04ad6ba0",
-      },
-    });
+  test("renders the AccountSelector component", () => {
+    // Arrange
+    const wrapper = createWrapper();
 
-    expect(wrapper.find('[data-test="account-heading"]').text()).toBe(
-      "Users for Account 1"
+    // Assert
+    expect(
+      wrapper.find('[data-test="account-selector-component"]').exists()
+    ).toBe(true);
+    expect(
+      wrapper.find('[data-test="account-selector-component"]').text()
+    ).toBe("Account Selector Component");
+  });
+
+  test("renders the ExpandableData component", () => {
+    // Arrange
+    const wrapper = createWrapper();
+
+    // Assert
+    expect(
+      wrapper.find('[data-test="expandable-data-component"]').exists()
+    ).toBe(true);
+    expect(wrapper.find('[data-test="expandable-data-component"]').text()).toBe(
+      "Expandable Data Component"
     );
+  });
 
-    expect(wrapper.find('[data-test="total-users"]').text()).toBe("Total: 5");
+  test("has the correct layout structure", () => {
+    // Arrange
+    const wrapper = createWrapper();
 
-    // // Check if correct number of pagination buttons are rendered
-    const paginationButtons = wrapper.findAll('[data-test="page-button"]');
-    expect(paginationButtons).toHaveLength(5); // 5 pages
+    // Assert
+    // Check for flex layout container
+    expect(wrapper.find(".flex.gap-6").exists()).toBe(true);
 
-    // Check we can click on the pagination button
-    paginationButtons.at(0).trigger("click");
-    expect(setUsersPage).toHaveBeenCalledWith(1);
+    // Check for two main columns with flex-1
+    const columns = wrapper.findAll(".flex-1");
+    expect(columns.length).toBe(2);
+
+    // First column contains Dashboard
+    expect(
+      columns.at(0).find('[data-test="dashboard-component"]').exists()
+    ).toBe(true);
+
+    // Second column contains AccountSelector and ExpandableData
+    expect(
+      columns.at(1).find('[data-test="account-selector-component"]').exists()
+    ).toBe(true);
+    expect(
+      columns.at(1).find('[data-test="expandable-data-component"]').exists()
+    ).toBe(true);
   });
 });

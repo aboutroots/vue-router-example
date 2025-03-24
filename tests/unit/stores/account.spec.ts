@@ -84,7 +84,10 @@ describe("Account Store", () => {
       expect(store.usersListPage).toBe(1);
       expect(store.usersListTotalPages).toBe(2);
       expect(store.usersListTotal).toBe(4);
-      expect(usersApi.getUsers).toHaveBeenCalledWith(1);
+      expect(usersApi.getUsers).toHaveBeenCalledWith({
+        accountId: mockAccount.id,
+        page: 1,
+      });
       expect(mockWait.start).toHaveBeenCalledWith(WaitKey.FETCH_USERS);
       expect(mockWait.end).toHaveBeenCalledWith(WaitKey.FETCH_USERS);
     });
@@ -138,7 +141,10 @@ describe("Account Store", () => {
       expect(store.usersListPage).toBe(2);
       expect(store.usersListTotalPages).toBe(2);
       expect(store.usersListTotal).toBe(12);
-      expect(usersApi.getUsers).toHaveBeenCalledWith(2);
+      expect(usersApi.getUsers).toHaveBeenCalledWith({
+        accountId: "",
+        page: 2,
+      });
       expect(mockWait.start).toHaveBeenCalledWith(WaitKey.FETCH_USERS);
       expect(mockWait.end).toHaveBeenCalledWith(WaitKey.FETCH_USERS);
     });
