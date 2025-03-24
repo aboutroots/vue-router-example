@@ -1,5 +1,8 @@
 # router_example
 
+[![Coverage Status](https://img.shields.io/badge/dynamic/json?url=https://aboutroots.github.io/vue-router-example/coverage/coverage-summary.json&label=coverage&query=$.total.statements.pct&suffix=%&color=brightgreen)](https://aboutroots.github.io/vue-router-example/coverage/)
+[![GitHub Pages](https://img.shields.io/badge/demo-online-brightgreen)](https://aboutroots.github.io/vue-router-example/)
+
 ## Project setup
 
 ```
@@ -22,6 +25,12 @@ yarn build
 
 ```
 yarn test:unit
+```
+
+### Run tests with coverage report
+
+```
+yarn test:coverage
 ```
 
 ### Lints and fixes files
@@ -47,9 +56,11 @@ This project is configured for automatic deployment to GitHub Pages using GitHub
 ### How it works
 
 - When you push to the `master` branch, the GitHub Actions workflow will automatically:
+  - Run tests with coverage reporting
   - Build your Vue application
-  - Deploy it to GitHub Pages
-- The app will be available at: `https://[your-username].github.io/vue-router-example/`
+  - Deploy the app and coverage reports to GitHub Pages
+- The app will be available at: [https://aboutroots.github.io/vue-router-example/](https://aboutroots.github.io/vue-router-example/)
+- Test coverage reports will be available at: [https://aboutroots.github.io/vue-router-example/coverage/](https://aboutroots.github.io/vue-router-example/coverage/)
 
 ### Manual Deployment
 

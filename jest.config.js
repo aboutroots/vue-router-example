@@ -6,4 +6,13 @@ module.exports = {
     "^.+\\.(js|jsx)$": "babel-jest",
   },
   transformIgnorePatterns: ["/node_modules/(?!(.+/?))"],
+  collectCoverageFrom: [
+    "src/**/*.{js,ts,vue}",
+    "!src/**/*.d.ts",
+    "!src/main.ts",
+    "!src/router/index.ts",
+    "!**/node_modules/**",
+  ],
+  coverageReporters: ["text", "html", "lcov", "json-summary"],
+  coverageDirectory: "coverage",
 };
