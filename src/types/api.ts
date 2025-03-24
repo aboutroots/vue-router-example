@@ -14,4 +14,14 @@ export interface PaginatedResponse<T> {
   data: T[];
 }
 
+export interface Account {
+  id: string;
+  name: string;
+}
+
+export interface Config {
+  defaultAccountId: string;
+  possibleAccounts: Account[];
+}
+
 export type PaginatedUsers = PaginatedResponse<User>;

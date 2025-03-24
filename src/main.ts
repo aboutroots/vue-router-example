@@ -8,12 +8,12 @@ import VueCompositionAPI from "@vue/composition-api";
 import VueWait from "vue-wait";
 import "./assets/tailwind.css";
 
+const wait = new VueWait();
+const pinia = createPinia();
+
 Vue.use(VueCompositionAPI);
 Vue.use(PiniaVuePlugin);
 Vue.use(VueWait);
-const pinia = createPinia();
-
-const wait = new VueWait();
 
 // Add vue-wait to all stores
 pinia.use(({ store }) => {
