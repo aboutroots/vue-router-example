@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import usersApi from "@/services/api/resources/users";
 import { User } from "@/types/api";
 import { WaitKey } from "@/constants";
+import { queryParser } from "@/services/QueryParser";
 
 interface Account {
   id: string;
@@ -30,6 +31,10 @@ export const useAccountStore = defineStore("account", {
       this.currentAccount = account;
       this.usersList = [];
       this.usersListPage = 1;
+
+      // Update URL with account ID
+      queryParser.setQueryParams({ accountId: account.id });
+
       await this.fetchUsersPage(1);
     },
 

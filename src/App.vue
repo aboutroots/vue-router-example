@@ -1,20 +1,17 @@
 <template>
-  <div id="app" class="font-sans antialiased text-gray-800">
-    <Sidebar />
-    <div class="ml-64 p-5 min-h-screen bg-gray-50">
-      <router-view />
-    </div>
+  <div id="app">
+    <AppLayout />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import Sidebar from "@/components/Sidebar.vue";
+import AppLayout from "@/components/AppLayout.vue";
 
 export default Vue.extend({
   name: "App",
   components: {
-    Sidebar,
+    AppLayout,
   },
 });
 </script>
@@ -24,6 +21,14 @@ export default Vue.extend({
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
 }
 </style>
