@@ -9,11 +9,15 @@ jest.mock("@/router", () => ({
   replace: jest.fn(),
 }));
 
+// Mock setTimeout and clearTimeout for testing debounce
+jest.useFakeTimers();
+
 describe("QueryParser", () => {
   beforeEach(() => {
     // Reset router mock before each test
     (router.currentRoute.query as any) = {};
     (router.replace as jest.Mock).mockClear();
+    jest.clearAllTimers();
   });
 
   describe("setQueryParams", () => {
@@ -26,6 +30,7 @@ describe("QueryParser", () => {
 
       // Act
       queryParser.setQueryParams(params);
+      jest.runAllTimers(); // Run all timers to trigger the debounced update
 
       // Assert
       expect(router.replace).toHaveBeenCalledWith({
@@ -34,6 +39,60 @@ describe("QueryParser", () => {
           search: "test",
         },
       });
+    });
+
+    // New test for debouncing functionality
+    it("debounces multiple calls and batches parameter updates", () => {
+      // Act: Make multiple calls with different parameters in quick succession
+      queryParser.setQueryParams({ page: "1" });
+      queryParser.setQueryParams({ search: "test" });
+      queryParser.setQueryParams({ page: "2" }); // This should override the previous page value
+
+      // Verify no updates have happened yet
+      expect(router.replace).not.toHaveBeenCalled();
+
+      // Fast-forward timers to trigger the debounced update
+      jest.runAllTimers();
+
+      // Assert: Only one update should have occurred with the merged parameters
+      expect(router.replace).toHaveBeenCalledTimes(1);
+      expect(router.replace).toHaveBeenCalledWith({
+        query: {
+          page: "2", // Last value wins
+          search: "test",
+        },
+      });
+    });
+
+    it("clears existing timeout when new calls to setQueryParams are made", () => {
+      // Spy on clearTimeout
+      const clearTimeoutSpy = jest.spyOn(window, "clearTimeout");
+
+      // First call - should set a timeout but not clear any
+      queryParser.setQueryParams({ page: "1" });
+      expect(clearTimeoutSpy).not.toHaveBeenCalled();
+
+      // Second call - should clear the previous timeout
+      queryParser.setQueryParams({ search: "test" });
+      expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
+
+      // Third call - should clear the timeout again
+      queryParser.setQueryParams({ filter: "active" });
+      expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
+
+      // Run timers and check the final result
+      jest.runAllTimers();
+      expect(router.replace).toHaveBeenCalledTimes(1);
+      expect(router.replace).toHaveBeenCalledWith({
+        query: {
+          page: "1",
+          search: "test",
+          filter: "active",
+        },
+      });
+
+      // Clean up spy
+      clearTimeoutSpy.mockRestore();
     });
 
     it("removes all query parameters when all values are null/empty", () => {
@@ -48,6 +107,7 @@ describe("QueryParser", () => {
 
       // Act
       queryParser.setQueryParams(params);
+      jest.runAllTimers(); // Run all timers to trigger the debounced update
 
       // Assert
       expect(router.replace).toHaveBeenCalledWith({
@@ -68,6 +128,7 @@ describe("QueryParser", () => {
 
       // Act
       queryParser.setQueryParams(params);
+      jest.runAllTimers(); // Run all timers to trigger the debounced update
 
       // Assert
       expect(router.replace).toHaveBeenCalledWith({
@@ -88,6 +149,7 @@ describe("QueryParser", () => {
 
       // Act
       queryParser.setQueryParams(params);
+      jest.runAllTimers(); // Run all timers to trigger the debounced update
 
       // Assert
       expect(router.replace).toHaveBeenCalledWith({
@@ -110,6 +172,7 @@ describe("QueryParser", () => {
 
       // Act
       queryParser.setQueryParams(params);
+      jest.runAllTimers(); // Run all timers to trigger the debounced update
 
       // Assert
       expect(router.replace).not.toHaveBeenCalled();
@@ -125,6 +188,7 @@ describe("QueryParser", () => {
 
       // Act
       queryParser.setQueryParams(params);
+      jest.runAllTimers(); // Run all timers to trigger the debounced update
 
       // Assert
       expect(router.replace).toHaveBeenCalledWith({
