@@ -2,6 +2,7 @@ import { mount } from "@vue/test-utils";
 import ControlPanel from "@/components/ControlPanel.vue";
 
 const setAccount = jest.fn();
+const setMode = jest.fn();
 
 // Mock account store
 const mockUseAccountStore = jest.fn().mockReturnValue({
@@ -18,12 +19,22 @@ const mockUseConfigStore = jest.fn().mockReturnValue({
   ],
 });
 
+// Mock specialMode store
+const mockUseSpecialModeStore = jest.fn().mockReturnValue({
+  mode: null,
+  setMode,
+});
+
 jest.mock("@/stores/account", () => ({
   useAccountStore: () => mockUseAccountStore(),
 }));
 
 jest.mock("@/stores/config", () => ({
   useConfigStore: () => mockUseConfigStore(),
+}));
+
+jest.mock("@/stores/specialMode", () => ({
+  useSpecialModeStore: () => mockUseSpecialModeStore(),
 }));
 
 describe("ControlPanel.vue", () => {
@@ -99,6 +110,54 @@ describe("ControlPanel.vue", () => {
       id: "account2",
       name: "Account 2",
     });
+  });
+
+  test("renders special mode buttons correctly", () => {
+    // Arrange
+    const wrapper = createWrapper();
+
+    // Assert
+    const modeButtons = wrapper.findAll('[data-test="special-mode-button"]');
+    expect(modeButtons).toHaveLength(2); // PRIMARY and SECONDARY
+
+    // Check if mode names are displayed correctly
+    expect(modeButtons.at(0).text().trim()).toBe("PRIMARY");
+    expect(modeButtons.at(1).text().trim()).toBe("SECONDARY");
+  });
+
+  test("highlights the current special mode", () => {
+    // Arrange
+    mockUseSpecialModeStore.mockReturnValue({
+      mode: "PRIMARY",
+      setMode,
+    });
+
+    // Act
+    const wrapper = createWrapper();
+    const modeButtons = wrapper.findAll('[data-test="special-mode-button"]');
+
+    // Assert
+    // PRIMARY should be highlighted
+    expect(modeButtons.at(0).classes()).toContain("bg-white");
+    expect(modeButtons.at(0).classes()).toContain("shadow");
+    expect(modeButtons.at(0).classes()).toContain("text-gray-800");
+
+    // SECONDARY should not be highlighted
+    expect(modeButtons.at(1).classes()).not.toContain("bg-white");
+    expect(modeButtons.at(1).classes()).not.toContain("shadow");
+    expect(modeButtons.at(1).classes()).not.toContain("text-gray-800");
+  });
+
+  test("calls setMode when a special mode is selected", async () => {
+    // Arrange
+    const wrapper = createWrapper();
+    const modeButtons = wrapper.findAll('[data-test="special-mode-button"]');
+
+    // Act
+    await modeButtons.at(1).trigger("click");
+
+    // Assert
+    expect(setMode).toHaveBeenCalledWith("SECONDARY");
   });
 
   test("displays the modal buttons", () => {

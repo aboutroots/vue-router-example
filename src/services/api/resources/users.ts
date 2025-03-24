@@ -9,6 +9,7 @@ const delay = (range: { min: number; max: number }) => {
 
 const usersApi = {
   getUsers: async ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     accountId,
     page = 1,
   }: {
@@ -20,6 +21,7 @@ const usersApi = {
     return response.data;
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFavoriteUsers: async (accountId: string): Promise<User[]> => {
     // Always get the 2nd page of users
     await delay({ min: 700, max: 1300 });

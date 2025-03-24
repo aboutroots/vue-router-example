@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import usersApi from "@/services/api/resources/users";
 import { User } from "@/types/api";
 import { WaitKey } from "@/constants";
-import { queryParser } from "@/services/QueryParser";
+import { queryUpdater } from "@/services/QueryUpdater";
 
 interface Account {
   id: string;
@@ -31,14 +31,25 @@ export const useAccountStore = defineStore("account", {
   }),
 
   actions: {
-    async setAccount(account: Account): Promise<boolean> {
+    /**
+     * Sets the current account and updates related data.
+     * @param account The account to set
+     * @param options Options to control whether the URL should be updated
+     * @returns Promise that resolves to true if successful, false otherwise
+     */
+    async setAccount(
+      account: Account,
+      options: { updateUrl?: boolean } = { updateUrl: true }
+    ): Promise<boolean> {
       try {
         this.currentAccount = account;
         this.usersList = [];
         this.usersListPage = 1;
 
-        // Update URL with account ID
-        queryParser.setQueryParams({ accountId: account.id });
+        // Update URL with account ID if updateUrl is true
+        if (options.updateUrl) {
+          queryUpdater.updateQueryParams({ accountId: account.id });
+        }
 
         // Load users and optionally favorite users simultaneously
         await Promise.all([

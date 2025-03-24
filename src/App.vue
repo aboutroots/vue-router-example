@@ -9,6 +9,9 @@ import Vue from "vue";
 import AppLayout from "@/components/AppLayout.vue";
 import { useConfigStore } from "./stores/config";
 import { mapState, mapActions } from "pinia";
+import { queryParamSynchronizer } from "@/services/QueryParamSynchronizer";
+import { queryReader } from "@/services/QueryReader";
+import router from "./router";
 
 export default Vue.extend({
   name: "App",
@@ -34,17 +37,37 @@ export default Vue.extend({
             // Import the account store dynamically to avoid circular dependency
             const { useAccountStore } = await import("./stores/account");
             const accountStore = useAccountStore();
-            await accountStore.setAccount(defaultAccount);
+
+            // Only set default account if there's no account already set (e.g., from URL params)
+            if (!accountStore.currentAccount) {
+              await accountStore.setAccount(defaultAccount);
+            }
           } catch (error) {
             console.error("Failed to set default account:", error);
           }
         }
       }
     },
+
+    async processInitialQueryParams() {
+      // Process URL parameters if any exist
+      const hasQueryParams = await queryReader.hasQueryParams();
+      if (hasQueryParams) {
+        await queryParamSynchronizer.processQueryParams(router.currentRoute, {
+          updateUrl: true,
+        });
+      }
+    },
   },
 
   async created() {
+    // 1. Load configuration first
     await this.loadConfig();
+
+    // 2. Process URL parameters
+    await this.processInitialQueryParams();
+
+    // 3. Set default account if needed (won't override if account was set from URL)
     await this.setDefaultAccount();
   },
 });
