@@ -7,6 +7,7 @@ jest.mock("@/services/api/resources/users", () => ({
   __esModule: true,
   default: {
     getUsers: jest.fn(),
+    getFavoriteUsers: jest.fn(),
   },
 }));
 
@@ -25,8 +26,7 @@ describe("Account Store", () => {
     // Reset all mocks before each test
     jest.clearAllMocks();
     // Replace with mock function so that it doesn't spam the console
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    jest.spyOn(console, "error").mockImplementation(() => {});
+    jest.spyOn(console, "error").mockImplementation(jest.fn());
   });
 
   describe("setAccount", () => {
@@ -92,6 +92,48 @@ describe("Account Store", () => {
       expect(mockWait.end).toHaveBeenCalledWith(WaitKey.FETCH_USERS);
     });
 
+    it("should fetch favorite users when favoriteUsersFetched is true", async () => {
+      // Arrange
+      const mockFavoriteUsers = [
+        {
+          id: 3,
+          email: "favorite@example.com",
+          first_name: "Favorite",
+          last_name: "User",
+          avatar: "https://example.com/avatar3.jpg",
+        },
+      ];
+
+      (usersApi.getUsers as jest.Mock).mockResolvedValue(mockUsersResponse);
+      (usersApi.getFavoriteUsers as jest.Mock).mockResolvedValue(
+        mockFavoriteUsers
+      );
+
+      // Set initial state with favoriteUsersFetched true
+      store.favoriteUsersFetched = true;
+
+      // Act
+      await store.setAccount(mockAccount);
+
+      // Assert
+      expect(usersApi.getFavoriteUsers).toHaveBeenCalledWith(mockAccount.id);
+      expect(store.favoriteUsers).toEqual(mockFavoriteUsers);
+      expect(mockWait.start).toHaveBeenCalledWith(WaitKey.FETCH_FAVORITE_USERS);
+      expect(mockWait.end).toHaveBeenCalledWith(WaitKey.FETCH_FAVORITE_USERS);
+    });
+
+    it("should not fetch favorite users when favoriteUsersFetched is false", async () => {
+      // Arrange
+      (usersApi.getUsers as jest.Mock).mockResolvedValue(mockUsersResponse);
+
+      // Act
+      await store.setAccount(mockAccount);
+
+      // Assert
+      expect(usersApi.getFavoriteUsers).not.toHaveBeenCalled();
+      expect(store.favoriteUsers).toEqual([]);
+    });
+
     it("should handle API errors when setting account", async () => {
       // Arrange
       const error = new Error("API Error");
@@ -105,6 +147,105 @@ describe("Account Store", () => {
       expect(store.usersList).toEqual([]);
       expect(mockWait.start).toHaveBeenCalledWith(WaitKey.FETCH_USERS);
       expect(mockWait.end).toHaveBeenCalledWith(WaitKey.FETCH_USERS);
+    });
+  });
+
+  describe("fetchFavoriteUsers", () => {
+    const mockAccount = {
+      id: "test-id",
+      name: "Test Account",
+    };
+
+    const mockFavoriteUsers = [
+      {
+        id: 3,
+        email: "favorite@example.com",
+        first_name: "Favorite",
+        last_name: "User",
+        avatar: "https://example.com/avatar3.jpg",
+      },
+      {
+        id: 4,
+        email: "favorite2@example.com",
+        first_name: "Favorite2",
+        last_name: "User2",
+        avatar: "https://example.com/avatar4.jpg",
+      },
+    ];
+
+    beforeEach(() => {
+      // Set current account
+      store.currentAccount = mockAccount;
+    });
+
+    it("should fetch favorite users and update state", async () => {
+      // Arrange
+      (usersApi.getFavoriteUsers as jest.Mock).mockResolvedValue(
+        mockFavoriteUsers
+      );
+
+      // Act
+      const result = await store.fetchFavoriteUsers();
+
+      // Assert
+      expect(result).toBe(true);
+      expect(usersApi.getFavoriteUsers).toHaveBeenCalledWith(mockAccount.id);
+      expect(store.favoriteUsers).toEqual(mockFavoriteUsers);
+      expect(store.favoriteUsersFetched).toBe(true);
+      expect(mockWait.start).toHaveBeenCalledWith(WaitKey.FETCH_FAVORITE_USERS);
+      expect(mockWait.end).toHaveBeenCalledWith(WaitKey.FETCH_FAVORITE_USERS);
+    });
+
+    it("should handle API errors when fetching favorite users", async () => {
+      // Arrange
+      const error = new Error("API Error");
+      (usersApi.getFavoriteUsers as jest.Mock).mockRejectedValue(error);
+
+      // Act
+      const result = await store.fetchFavoriteUsers();
+
+      // Assert
+      expect(result).toBe(false);
+      expect(usersApi.getFavoriteUsers).toHaveBeenCalledWith(mockAccount.id);
+      expect(store.favoriteUsers).toEqual([]);
+      expect(store.favoriteUsersFetched).toBe(false);
+      expect(mockWait.start).toHaveBeenCalledWith(WaitKey.FETCH_FAVORITE_USERS);
+      expect(mockWait.end).toHaveBeenCalledWith(WaitKey.FETCH_FAVORITE_USERS);
+    });
+
+    it("should return false if no current account is set", async () => {
+      // Arrange
+      store.currentAccount = null;
+
+      // Act
+      const result = await store.fetchFavoriteUsers();
+
+      // Assert
+      expect(result).toBe(false);
+      expect(usersApi.getFavoriteUsers).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("clearFavoriteUsers", () => {
+    it("should clear favorite users and reset favoriteUsersFetched flag", () => {
+      // Arrange
+      store.favoriteUsers = [
+        {
+          id: 1,
+          email: "test@example.com",
+          first_name: "Test",
+          last_name: "User",
+          avatar: "https://example.com/avatar.jpg",
+        },
+      ];
+      store.favoriteUsersFetched = true;
+
+      // Act
+      store.clearFavoriteUsers();
+
+      // Assert
+      expect(store.favoriteUsers).toEqual([]);
+      expect(store.favoriteUsersFetched).toBe(false);
     });
   });
 

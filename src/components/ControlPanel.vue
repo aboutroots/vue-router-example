@@ -1,8 +1,9 @@
 <template>
   <div class="bg-white rounded-lg shadow p-4">
+    <h3 class="text-lg font-semibold mb-3">Control Panel</h3>
     <div class="flex flex-col gap-4">
       <!-- Account selector -->
-      <div class="flex rounded-lg bg-gray-100 p-1">
+      <div class="flex rounded-lg bg-gray-100 p-2 mb-4">
         <button
           v-for="account in availableAccounts"
           :key="account.id"
@@ -41,7 +42,7 @@ import { useConfigStore } from "@/stores/config";
 import { Account } from "@/types/api";
 
 export default Vue.extend({
-  name: "AccountSelector",
+  name: "ControlPanel",
 
   data() {
     return {

@@ -15,6 +15,8 @@ interface AccountState {
   usersListPage: number;
   usersListTotalPages: number;
   usersListTotal: number;
+  favoriteUsers: User[];
+  favoriteUsersFetched: boolean;
 }
 
 export const useAccountStore = defineStore("account", {
@@ -24,6 +26,8 @@ export const useAccountStore = defineStore("account", {
     usersListPage: 1,
     usersListTotalPages: 1,
     usersListTotal: 0,
+    favoriteUsers: [],
+    favoriteUsersFetched: false,
   }),
 
   actions: {
@@ -36,7 +40,13 @@ export const useAccountStore = defineStore("account", {
         // Update URL with account ID
         queryParser.setQueryParams({ accountId: account.id });
 
-        await this.fetchUsersPage(1);
+        // Load users and optionally favorite users simultaneously
+        await Promise.all([
+          this.fetchUsersPage(1),
+          // If favorite users were previously fetched, fetch them for the new account too
+          ...(this.favoriteUsersFetched ? [this.fetchFavoriteUsers()] : []),
+        ]);
+
         return true;
       } catch (error) {
         console.error("Error setting account:", error);
@@ -69,6 +79,30 @@ export const useAccountStore = defineStore("account", {
         return await this.fetchUsersPage(page);
       }
       return false;
+    },
+
+    async fetchFavoriteUsers(): Promise<boolean> {
+      if (!this.currentAccount) return false;
+
+      try {
+        this.$wait.start(WaitKey.FETCH_FAVORITE_USERS);
+        const favorites = await usersApi.getFavoriteUsers(
+          this.currentAccount.id
+        );
+        this.favoriteUsers = favorites;
+        this.favoriteUsersFetched = true;
+        return true;
+      } catch (error) {
+        console.error("Error fetching favorite users:", error);
+        return false;
+      } finally {
+        this.$wait.end(WaitKey.FETCH_FAVORITE_USERS);
+      }
+    },
+
+    clearFavoriteUsers(): void {
+      this.favoriteUsers = [];
+      this.favoriteUsersFetched = false;
     },
   },
 });

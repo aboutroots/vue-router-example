@@ -13,23 +13,23 @@ jest.mock("@/components/Dashboard.vue", () => ({
     ),
 }));
 
-jest.mock("@/components/AccountSelector.vue", () => ({
-  name: "AccountSelector",
+jest.mock("@/components/ControlPanel.vue", () => ({
+  name: "ControlPanel",
   render: (h: CreateElement): VNode =>
     h(
       "div",
-      { attrs: { "data-test": "account-selector-component" } },
-      "Account Selector Component"
+      { attrs: { "data-test": "control-panel-component" } },
+      "Control Panel Component"
     ),
 }));
 
-jest.mock("@/components/ExpandableData.vue", () => ({
-  name: "ExpandableData",
+jest.mock("@/components/FavoriteUsers.vue", () => ({
+  name: "FavoriteUsers",
   render: (h: CreateElement): VNode =>
     h(
       "div",
-      { attrs: { "data-test": "expandable-data-component" } },
-      "Expandable Data Component"
+      { attrs: { "data-test": "favorite-users-component" } },
+      "Favorite Users Component"
     ),
 }));
 
@@ -52,29 +52,29 @@ describe("DashboardView", () => {
     );
   });
 
-  test("renders the AccountSelector component", () => {
+  test("renders the ControlPanel component", () => {
     // Arrange
     const wrapper = createWrapper();
 
     // Assert
-    expect(
-      wrapper.find('[data-test="account-selector-component"]').exists()
-    ).toBe(true);
-    expect(
-      wrapper.find('[data-test="account-selector-component"]').text()
-    ).toBe("Account Selector Component");
+    expect(wrapper.find('[data-test="control-panel-component"]').exists()).toBe(
+      true
+    );
+    expect(wrapper.find('[data-test="control-panel-component"]').text()).toBe(
+      "Control Panel Component"
+    );
   });
 
-  test("renders the ExpandableData component", () => {
+  test("renders the FavoriteUsers component", () => {
     // Arrange
     const wrapper = createWrapper();
 
     // Assert
     expect(
-      wrapper.find('[data-test="expandable-data-component"]').exists()
+      wrapper.find('[data-test="favorite-users-component"]').exists()
     ).toBe(true);
-    expect(wrapper.find('[data-test="expandable-data-component"]').text()).toBe(
-      "Expandable Data Component"
+    expect(wrapper.find('[data-test="favorite-users-component"]').text()).toBe(
+      "Favorite Users Component"
     );
   });
 
@@ -95,12 +95,12 @@ describe("DashboardView", () => {
       columns.at(0).find('[data-test="dashboard-component"]').exists()
     ).toBe(true);
 
-    // Second column contains AccountSelector and ExpandableData
+    // Second column contains ControlPanel and FavoriteUsers
     expect(
-      columns.at(1).find('[data-test="account-selector-component"]').exists()
+      columns.at(1).find('[data-test="control-panel-component"]').exists()
     ).toBe(true);
     expect(
-      columns.at(1).find('[data-test="expandable-data-component"]').exists()
+      columns.at(1).find('[data-test="favorite-users-component"]').exists()
     ).toBe(true);
   });
 });

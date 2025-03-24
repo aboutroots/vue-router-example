@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import AccountSelector from "@/components/AccountSelector.vue";
+import ControlPanel from "@/components/ControlPanel.vue";
 
 const setAccount = jest.fn();
 
@@ -26,10 +26,10 @@ jest.mock("@/stores/config", () => ({
   useConfigStore: () => mockUseConfigStore(),
 }));
 
-describe("AccountSelector.vue", () => {
+describe("ControlPanel.vue", () => {
   // Helper function to create the component
   const createWrapper = (options = {}) => {
-    return mount(AccountSelector, {
+    return mount(ControlPanel, {
       ...options,
     });
   };
