@@ -24,6 +24,64 @@ The app is available at: [https://aboutroots.github.io/vue-router-example/](http
 - no watchers used
 - no jquery
 
+## Data flow
+
+```mermaid
+---
+config:
+  theme: base
+  look: classic
+  layout: dagre
+---
+flowchart TD
+    Start([App Start]) --> AppCreation[App Creation]
+    AppCreation --> ApplicationLoop[Idle State]
+
+     subgraph AppCreation
+        direction TB
+        LoadConfig[Load Config from API] --> StoreConfig[Store Config]
+        StoreConfig --> CheckParams{Has URL Params?}
+        CheckParams -->|Yes| ParseQueryParams1[Parse URL Params]
+        CheckParams -->|No| SetDefaults[Set Default Values]
+        ParseQueryParams1 --> CheckAllLoaded{All data loaded?}
+        CheckAllLoaded -->|Yes| AppLoaded
+        CheckAllLoaded --> |No| SetDefaults
+        SetDefaults --> AppLoaded
+
+    end
+    subgraph ApplicationLoop
+        direction TB
+        Wait[Wait for Input] --> CheckInput{Input Type}
+        CheckInput -->|User interacts with UI| Components
+        CheckInput -->|Manual URL Update| ParseQueryParams[Parse URL Params]
+        Components --> |trigger store change| startAction[start store action]
+
+        subgraph UpdateQueryParams
+            direction TB
+            QueryUpdater -->|debounce updates| StartParse
+
+        end
+
+        subgraph UpdateStore
+            startAction --> UpdateURL{needs to update URL? }
+            UpdateURL --> |Yes, URL must reflect state| QueryUpdater
+            startAction --> fetchAndSetData
+
+        end
+
+        fetchAndSetData --> |propagate changes| Components
+
+
+     subgraph ParseQueryParams
+            direction TB
+            StartParse[Start Parse] --> Validate{Are params valid?}
+            Validate -->|Valid| startAction
+
+        end
+    end
+
+```
+
 ## Project setup
 
 ```
