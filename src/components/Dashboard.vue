@@ -2,7 +2,7 @@
   <div class="bg-white rounded-lg shadow">
     <div class="p-6">
       <div class="mb-8">
-        <label for="account-select" class="mr-3 font-semibold"
+        <label for="account-select" class="mr-3 font-semibold text-gray-800"
           >Select Account:</label
         >
         <select
@@ -24,8 +24,11 @@
         </select>
       </div>
 
-      <div v-if="hasCurrentAccount" class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold mb-4" data-test="account-heading">
+      <div v-if="hasCurrentAccount" class="bg-white rounded-lg">
+        <h2
+          class="text-xl font-semibold mb-4 text-gray-800"
+          data-test="account-heading"
+        >
           Users for {{ currentAccountName }}
         </h2>
         <p class="mb-4" data-test="total-users">Total: {{ usersListTotal }}</p>
@@ -92,8 +95,9 @@
               @click="handlePageChange(page)"
               class="px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
               :class="{
-                'bg-blue-600 text-white': page === usersListPage,
-                'bg-gray-200 text-gray-700 hover:bg-gray-300':
+                'bg-transparent text-gray-800 border border-gray-800':
+                  page === usersListPage,
+                'bg-transparent text-gray-700 border border-gray-300 hover:border-gray-400':
                   page !== usersListPage,
               }"
               data-test="page-button"

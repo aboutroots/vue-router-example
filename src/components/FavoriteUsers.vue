@@ -1,12 +1,12 @@
 <template>
   <div class="bg-white rounded-lg shadow p-4">
-    <h3 class="text-lg font-semibold mb-3">
+    <h3 class="text-lg font-semibold mb-3 text-gray-800">
       Favorite Users - loaded on demand
     </h3>
     <button
       @click="toggleExpand"
       data-test="toggle-button"
-      class="w-full py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors mb-4"
+      class="w-full py-2 px-4 bg-transparent text-gray-800 border border-gray-800 rounded-md hover:bg-gray-100 transition-colors mb-4"
     >
       {{ isExpanded ? "Hide Favorite Users" : "Click to Show Favorite Users" }}
     </button>
@@ -19,7 +19,9 @@
           </div>
         </template>
         <div v-if="favoriteUsers.length > 0" data-test="users-table-container">
-          <h3 class="text-lg font-semibold mb-3">Favorite Users</h3>
+          <h3 class="text-lg font-semibold mb-3 text-gray-800">
+            Favorite Users
+          </h3>
           <table class="min-w-full" data-test="users-table">
             <thead>
               <tr>

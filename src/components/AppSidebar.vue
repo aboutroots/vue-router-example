@@ -6,7 +6,9 @@
     @mouseleave="handleMouseLeave"
   >
     <div class="p-4 flex items-center justify-between">
-      <h1 v-if="!isCollapsed" class="text-xl font-bold">Dashboard</h1>
+      <h1 v-if="!isCollapsed" class="text-xl font-bold text-white">
+        Dashboard
+      </h1>
       <div class="flex space-x-2">
         <button
           v-if="!isCollapsed"
