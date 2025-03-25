@@ -3,6 +3,7 @@ import ControlPanel from "@/components/ControlPanel.vue";
 
 const setAccount = jest.fn();
 const setMode = jest.fn();
+const openModal = jest.fn();
 
 // Mock account store
 const mockUseAccountStore = jest.fn().mockReturnValue({
@@ -25,6 +26,11 @@ const mockUseSpecialModeStore = jest.fn().mockReturnValue({
   setMode,
 });
 
+// Mock modal store
+const mockUseModalStore = jest.fn().mockReturnValue({
+  openModal,
+});
+
 jest.mock("@/stores/account", () => ({
   useAccountStore: () => mockUseAccountStore(),
 }));
@@ -35,6 +41,10 @@ jest.mock("@/stores/config", () => ({
 
 jest.mock("@/stores/specialMode", () => ({
   useSpecialModeStore: () => mockUseSpecialModeStore(),
+}));
+
+jest.mock("@/stores/modals", () => ({
+  useModalStore: () => mockUseModalStore(),
 }));
 
 describe("ControlPanel.vue", () => {
@@ -179,7 +189,6 @@ describe("ControlPanel.vue", () => {
   test("calls openModal when a modal button is clicked", async () => {
     // Arrange
     const wrapper = createWrapper();
-    const spy = jest.spyOn(console, "log").mockImplementation(jest.fn());
     const modalButtons = wrapper
       .findAll("button")
       .filter(
@@ -191,7 +200,8 @@ describe("ControlPanel.vue", () => {
     await modalButtons.at(0).trigger("click");
 
     // Assert
-    expect(spy).toHaveBeenCalledWith("Opening modal 1");
-    spy.mockRestore();
+    expect(openModal).toHaveBeenCalledWith("user-details", {
+      props: { userId: 123, userName: "John Doe" },
+    });
   });
 });
