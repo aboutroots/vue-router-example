@@ -1,18 +1,26 @@
 <template>
-  <div class="confirmation-modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>{{ title }}</h2>
-      </div>
+  <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4 p-6">
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold text-gray-800">{{ title }}</h2>
+    </div>
 
-      <div class="modal-body">
-        <p>{{ message }}</p>
-      </div>
+    <div class="mb-6">
+      <p class="text-gray-600">{{ message }}</p>
+    </div>
 
-      <div class="modal-footer">
-        <button @click="handleCancel" class="btn btn-cancel">Cancel</button>
-        <button @click="handleConfirm" class="btn btn-confirm">Confirm</button>
-      </div>
+    <div class="flex justify-center space-x-4">
+      <button
+        @click="handleCancel"
+        class="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200 font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        @click="handleConfirm"
+        class="px-4 py-2 text-white bg-gray-800 rounded-md hover:bg-gray-700 transition-colors duration-200 font-medium"
+      >
+        Confirm
+      </button>
     </div>
   </div>
 </template>
@@ -34,64 +42,22 @@ export default Vue.extend({
   },
   methods: {
     handleConfirm() {
-      // Emit confirm event for parent to handle
-      this.$emit("close");
-
-      // If onConfirm callback was provided, call it
-      this.$emit("confirm");
+      this.$emit("modal-event", {
+        eventName: "confirm",
+      });
+      this.$emit("modal-event", {
+        eventName: "close",
+      });
     },
 
     handleCancel() {
-      // Emit cancel event
-      this.$emit("close");
-
-      // If onCancel callback was provided, call it
-      this.$emit("cancel");
+      this.$emit("modal-event", {
+        eventName: "cancel",
+      });
+      this.$emit("modal-event", {
+        eventName: "close",
+      });
     },
   },
 });
 </script>
-
-<style scoped>
-.confirmation-modal {
-  background: white;
-  border-radius: 8px;
-  max-width: 400px;
-  width: 100%;
-  padding: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-.modal-header {
-  margin-bottom: 20px;
-}
-
-.modal-body {
-  margin-bottom: 20px;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.btn {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.btn-cancel {
-  background-color: #e0e0e0;
-  color: #333;
-}
-
-.btn-confirm {
-  background-color: #4caf50;
-  color: white;
-}
-</style>

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ModalRegistry, ModalState } from "@/types/modals";
+import { ModalEvent, ModalRegistry, ModalState } from "@/types/modals";
 import UserDetailsModal from "@/components/modals/UserDetailsModal.vue";
 import ConfirmationModal from "@/components/modals/ConfirmationModal.vue";
 import Vue from "vue";
@@ -15,7 +15,7 @@ export const useModalStore = defineStore("modals", {
       options: {
         id?: string;
         props?: ModalRegistry[K]["props"];
-        callbacks?: ModalRegistry[K]["callbacks"];
+        eventListeners?: ModalRegistry[K]["eventListeners"];
       } = {}
     ) {
       const id = options.id || `${modalType}-${Date.now()}`;
@@ -23,9 +23,10 @@ export const useModalStore = defineStore("modals", {
 
       Vue.set(this.activeModals, id, {
         id,
+        modalType,
         component: modalComponent,
         props: options.props || {},
-        callbacks: options.callbacks || {},
+        eventListeners: options.eventListeners || {},
         openedAt: Date.now(),
       });
 
@@ -35,14 +36,29 @@ export const useModalStore = defineStore("modals", {
     closeModal(id?: string) {
       if (id) {
         if (this.activeModals[id]) {
-          const closeCallback = this.activeModals[id].callbacks?.onClose;
-          if (closeCallback) closeCallback();
+          const closeListener = this.activeModals[id].eventListeners?.close;
+          if (closeListener) closeListener();
           Vue.delete(this.activeModals, id);
         }
       } else {
         Object.keys(this.activeModals).forEach((modalId) =>
           this.closeModal(modalId)
         );
+      }
+    },
+
+    handleModalEvent(modalId: string, eventData: ModalEvent) {
+      const modal = this.activeModals[modalId];
+      if (!modal) return;
+
+      const listener = modal.eventListeners?.[eventData.eventName];
+      if (listener) {
+        listener(...(eventData.args || []));
+      }
+
+      // If it's a close event, close the modal
+      if (eventData.eventName === "close") {
+        this.closeModal(modalId);
       }
     },
 

@@ -1,30 +1,31 @@
 import { DefineComponent } from "vue";
 
 // Generic interface for modal configuration
-export interface ModalConfig<P = any, C = any> {
+export interface ModalConfig<P = any, E = any> {
   component: DefineComponent;
   props?: P;
-  callbacks?: {
-    [K in keyof C]?: C[K];
+  eventListeners?: {
+    [K in keyof E]?: E[K];
   };
 }
 
 // Modal state in the store
 export interface ModalState {
   id: string;
+  modalType: keyof ModalRegistry;
   component: Vue.Component;
   props?: any;
-  callbacks?: Record<string, (...args: any[]) => void>;
+  eventListeners?: Record<string, (...args: any[]) => void>;
   openedAt: number;
 }
 
 // Type-safe modal registry to help with type inference
 export type ModalRegistry = {
   "user-details": ModalConfig<
-    { userId: number },
+    { userId: number; userName: string },
     {
-      onClose?: () => void;
-      onUserAction?: (action: string) => void;
+      close?: () => void;
+      userAction?: (action: string) => void;
     }
   >;
   confirmation: ModalConfig<
@@ -33,9 +34,15 @@ export type ModalRegistry = {
       message: string;
     },
     {
-      onConfirm?: () => void;
-      onCancel?: () => void;
+      close?: () => void;
+      confirm?: () => void;
+      cancel?: () => void;
     }
   >;
   // Add more modal types as needed
+};
+
+export type ModalEvent = {
+  eventName: string;
+  args?: any[];
 };

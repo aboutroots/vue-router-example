@@ -14,7 +14,7 @@
           <component
             :is="modal.component"
             v-bind="modal.props"
-            @close="() => closeModal(modal.id)"
+            @modal-event="(eventData) => handleModalEvent(modal, eventData)"
           />
         </div>
       </transition-group>
@@ -26,7 +26,7 @@
 import Vue from "vue";
 import { useModalStore } from "@/stores/modals";
 import { mapState } from "pinia";
-import { ModalState } from "@/types/modals";
+import { ModalState, ModalEvent } from "@/types/modals";
 
 export default Vue.extend({
   name: "ModalContainer",
@@ -43,10 +43,11 @@ export default Vue.extend({
       );
     },
   },
+
   methods: {
-    closeModal(id: string): void {
-      const store = useModalStore();
-      store.closeModal(id);
+    handleModalEvent(modal: ModalState, eventData: ModalEvent) {
+      const modalStore = useModalStore();
+      modalStore.handleModalEvent(modal.id, eventData);
     },
   },
 });

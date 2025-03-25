@@ -130,15 +130,7 @@ export default Vue.extend({
       const modalStore = useModalStore();
 
       modalStore.openModal("user-details", {
-        props: { userId: 123 },
-        callbacks: {
-          onClose: () => console.log("Modal closed"),
-          onUserAction: (action) => {
-            if (action === "edit") {
-              console.log("Edit logic");
-            }
-          },
-        },
+        props: { userId: 123, userName: "John Doe" },
       });
     },
 
@@ -148,15 +140,20 @@ export default Vue.extend({
 
       modalStore.openModal("confirmation", {
         props: {
-          title: "Delete Item",
-          message: "Are you sure you want to delete this item?",
+          title: "Perform Destructive Action",
+          message:
+            "Are you sure you want to perform some destructive action? This action cannot be undone.",
         },
-        callbacks: {
-          onConfirm: () => {
-            console.log("Confirm logic");
+        eventListeners: {
+          confirm: () => {
+            console.log(
+              "Confirmed! - this is being called from the control panel"
+            );
           },
-          onCancel: () => {
-            console.log("Cancel logic");
+          cancel: () => {
+            console.log(
+              "Canceled! - this is being called from the control panel"
+            );
           },
         },
       });
