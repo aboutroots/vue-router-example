@@ -21,7 +21,8 @@ class QueryParamSynchronizer {
     route: Route,
     options: { updateUrl?: boolean } = { updateUrl: false }
   ): Promise<void> {
-    // Prevent loops during processing
+    // Prevent loops during processing. Note that this works because this is
+    // a singleton instance.
     if (this.isProcessing) return;
 
     try {
@@ -148,5 +149,9 @@ class QueryParamSynchronizer {
   }
 }
 
-// Export a singleton instance
+// Export a singleton instance.
+// In JavaScript/TypeScript, a singleton instance like this will be shared across all imports.
+// This is because:
+// - When a module is first imported, it is evaluated and initialized only once.
+// - The exported instance is the same object reference across all imports.
 export const queryParamSynchronizer = new QueryParamSynchronizer();

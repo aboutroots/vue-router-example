@@ -58,13 +58,14 @@ flowchart TD
 
         subgraph UpdateQueryParams
             direction TB
-            QueryUpdater -->|debounce updates| StartParse
+            QueryUpdater -->|debounce updates| UpdateParams
 
         end
 
         subgraph UpdateStore
             startAction --> UpdateURL{needs to update URL? }
-            UpdateURL --> |Yes, URL must reflect state| QueryUpdater
+            UpdateURL --> |Yes, in this case URL must reflect state| QueryUpdater
+            UpdateURL --> |No, it would cause a loop or there is nothing that should be reflected in the URL| DoNothing
             startAction --> fetchAndSetData
 
         end
@@ -78,6 +79,8 @@ flowchart TD
             Validate -->|Valid| startAction
 
         end
+    UpdateParams --> StartParse
+
     end
 
 ```
