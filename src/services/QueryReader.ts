@@ -1,5 +1,6 @@
 import { isArray } from "lodash-es";
 import { Route } from "vue-router";
+import router from "@/router";
 
 /**
  * Service responsible for reading URL query parameters.
@@ -13,8 +14,6 @@ class QueryReader {
    * @returns The value of the query parameter or null if not found
    */
   async getQueryParam(key: string): Promise<string | null> {
-    // Import router dynamically to avoid circular dependencies
-    const router = (await import("@/router")).default;
     const val = router.currentRoute.query[key] || null;
     if (isArray(val)) {
       return val[0] || null;
@@ -42,8 +41,6 @@ class QueryReader {
    * @returns True if there are query parameters, false otherwise
    */
   async hasQueryParams(): Promise<boolean> {
-    // Import router dynamically to avoid circular dependencies
-    const router = (await import("@/router")).default;
     return Object.keys(router.currentRoute.query).length > 0;
   }
 
@@ -63,8 +60,6 @@ class QueryReader {
   async getAllQueryParams(): Promise<
     Record<string, string | (string | null)[] | null>
   > {
-    // Import router dynamically to avoid circular dependencies
-    const router = (await import("@/router")).default;
     return { ...router.currentRoute.query };
   }
 

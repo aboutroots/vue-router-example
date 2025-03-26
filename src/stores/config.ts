@@ -5,13 +5,18 @@ import { defineStore } from "pinia";
 
 interface ConfigState extends Config {
   isLoaded: boolean;
+  isAppInitialized: boolean;
 }
 
 export const useConfigStore = defineStore("config", {
   state: (): ConfigState => ({
     defaultAccountId: "",
     possibleAccounts: [],
+    // Whether the config has been loaded from the server
     isLoaded: false,
+    // Whether the app has been initialized with default values
+    // (must be done after config is loaded)
+    isAppInitialized: false,
   }),
 
   actions: {
@@ -27,6 +32,13 @@ export const useConfigStore = defineStore("config", {
       } finally {
         this.$wait.end(WaitKey.FETCH_CONFIG);
       }
+    },
+
+    markAsInitialized() {
+      if (!this.isLoaded) {
+        throw new Error("Config is not loaded, could not mark as initialized");
+      }
+      this.isAppInitialized = true;
     },
   },
 });

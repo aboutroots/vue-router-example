@@ -1,12 +1,13 @@
-import { queryUpdater } from "@/services/QueryUpdater";
-
-// Create a mock router object
+// Create a mock router object first, before importing the real module
 const mockRouter = {
   currentRoute: {
     query: {},
   },
   replace: jest.fn(),
 };
+
+// Now import the module to test
+import { queryUpdater } from "@/services/QueryUpdater";
 
 // Mock the router module
 jest.mock("@/router", () => ({
@@ -45,7 +46,10 @@ jest.mock(
 
       // Only update if there are actual changes
       mockRouter.replace({
-        query: currentQuery,
+        query: Object.fromEntries(
+          // Sort the query parameters alphabetically
+          Object.entries(currentQuery).sort(([a], [b]) => a.localeCompare(b))
+        ),
       });
 
       // Reset pending updates and timeout
@@ -72,24 +76,6 @@ describe("QueryUpdater", () => {
     // Reset the pending updates in queryUpdater
     (queryUpdater as any).pendingUpdates = {};
     (queryUpdater as any).updateTimeoutId = null;
-  });
-
-  describe("setQueryParams (deprecated)", () => {
-    it("calls updateQueryParams internally", () => {
-      // Arrange
-      const spy = jest.spyOn(queryUpdater, "updateQueryParams");
-      const params = { page: "1" };
-
-      // Act
-      queryUpdater.setQueryParams(params);
-
-      // Assert
-      expect(spy).toHaveBeenCalledWith(params);
-
-      // Cleanup
-      spy.mockRestore();
-      jest.runAllTimers(); // To clear pending timers
-    });
   });
 
   describe("updateQueryParams", () => {

@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-
+import router from "@/router";
 /**
  * Service responsible for updating URL query parameters.
  * Implements the Singleton pattern to ensure a single instance manages all URL updates.
@@ -34,22 +34,9 @@ class QueryUpdater {
   }
 
   /**
-   * Sets the URL query parameters without triggering a navigation.
-   * Updates are batched within a 50ms window to avoid multiple URL changes.
-   * @param params - Object containing key-value pairs of query parameters.
-   * @deprecated Use updateQueryParams instead which maintains existing parameters
-   */
-  setQueryParams(params: Record<string, number | string | null>): void {
-    this.updateQueryParams(params);
-  }
-
-  /**
    * Apply all pending query parameter updates at once
    */
   private async applyPendingUpdates(): Promise<void> {
-    // Import router dynamically to avoid circular dependencies
-    const router = (await import("@/router")).default;
-
     // Start with existing query parameters
     const currentQuery = { ...router.currentRoute.query };
 
