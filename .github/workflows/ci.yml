@@ -11,11 +11,8 @@ permissions:
   id-token: write
 
 jobs:
-  build-and-deploy:
+  ci:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout
@@ -47,15 +44,3 @@ jobs:
         run: |
           mkdir -p dist/coverage
           cp -r coverage/* dist/coverage/
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: "dist"
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

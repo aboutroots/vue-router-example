@@ -46,7 +46,7 @@ class QueryParamSynchronizer {
       if (needsUrlUpdate && Object.keys(normalizedParams).length > 0) {
         // Using updateQueryParams directly for normalization
         // This won't cause loops because we're inside isProcessing=true block
-        queryUpdater.updateQueryParams(normalizedParams);
+        queryUpdater.updateQueryParams(normalizedParams, route.query);
       }
 
       // Wait for all promises to complete
