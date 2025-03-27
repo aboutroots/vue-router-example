@@ -10,46 +10,6 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
     />
-    <!-- Start Single Page Apps for GitHub Pages -->
-    <script type="text/javascript">
-      // Single Page Apps for GitHub Pages
-      // MIT License
-      // https://github.com/rafgraph/spa-github-pages
-      (function (l) {
-        // Handle redirects for path-based routing
-        if (l.search[1] === "/") {
-          var decoded = l.search
-            .slice(1)
-            .split("&")
-            .map(function (s) {
-              return s.replace(/~and~/g, "&");
-            })
-            .join("?");
-          window.history.replaceState(
-            null,
-            null,
-            l.pathname.slice(0, -1) + decoded + l.hash
-          );
-        }
-
-        // Handle direct query parameters
-        if (l.search && l.search.length > 1) {
-          // Store the current URL with query parameters
-          var currentUrl = l.pathname + l.search + l.hash;
-
-          // Only update if we're not already on the correct URL
-          if (
-            currentUrl !==
-            window.location.pathname +
-              window.location.search +
-              window.location.hash
-          ) {
-            window.history.replaceState(null, null, currentUrl);
-          }
-        }
-      })(window.location);
-    </script>
-    <!-- End Single Page Apps for GitHub Pages -->
   </head>
   <body>
     <noscript>
