@@ -1,9 +1,9 @@
 # router_example
 
 [![Coverage Status](https://img.shields.io/badge/dynamic/json?url=https://aboutroots.github.io/vue-router-example/coverage/coverage-summary.json&label=coverage&query=$.total.statements.pct&suffix=%&color=brightgreen)](https://aboutroots.github.io/vue-router-example/coverage/)
-[![GitHub Pages](https://img.shields.io/badge/demo-online-brightgreen)](https://aboutroots.github.io/vue-router-example/)
+[![Vercel](https://img.shields.io/badge/demo-online-brightgreen)](https://vue-router-example.vercel.app)
 
-The app is available at: [https://aboutroots.github.io/vue-router-example/](https://aboutroots.github.io/vue-router-example/)
+The app is available at: https://vue-router-example.vercel.app
 
 ## this is a demo of:
 
@@ -42,10 +42,11 @@ flowchart TD
         LoadConfig[Load Config from API] --> StoreConfig[Store Config]
         StoreConfig --> CheckParams{Has URL Params?}
         CheckParams -->|Yes| ParseQueryParams1[Parse URL Params]
-        CheckParams -->|No| SetDefaults[Set Default Values]
-        ParseQueryParams1 --> CheckAllLoaded{All data loaded?}
+        ParseQueryParams1 --> LoadFromParams[Execute store actions to load data based on params]
+        CheckParams -->|No| CheckAllLoaded
+        LoadFromParams --> CheckAllLoaded{All required initial data loaded?}
         CheckAllLoaded -->|Yes| AppLoaded
-        CheckAllLoaded --> |No| SetDefaults
+        CheckAllLoaded --> |No| SetDefaults[Set Default Values]
         SetDefaults --> AppLoaded
 
     end
@@ -56,13 +57,13 @@ flowchart TD
         CheckInput -->|Manual URL Update| ParseQueryParams[Parse URL Params]
         Components --> |trigger store change| startAction[start store action]
 
-        subgraph UpdateQueryParams
+        subgraph UpdateQueryParams[QueryUpdater service]
             direction TB
             QueryUpdater -->|debounce updates| UpdateParams
 
         end
 
-        subgraph UpdateStore
+        subgraph UpdateStore[Pinia stores]
             startAction --> UpdateURL{needs to update URL? }
             UpdateURL --> |Yes, in this case URL must reflect state| QueryUpdater
             UpdateURL --> |No, it would cause a loop or there is nothing that should be reflected in the URL| DoNothing
@@ -73,7 +74,7 @@ flowchart TD
         fetchAndSetData --> |propagate changes| Components
 
 
-     subgraph ParseQueryParams
+     subgraph ParseQueryParams[Navigation Guard - parse query params]
             direction TB
             StartParse[Start Parse] --> Validate{Are params valid?}
             Validate -->|Valid| startAction
