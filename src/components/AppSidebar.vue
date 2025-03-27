@@ -32,7 +32,12 @@
       <router-link
         v-for="item in menuItemsWithState"
         :key="item.name"
-        :to="{ name: item.name }"
+        :to="{
+          name: item.name,
+          query: {
+            ...$route.query,
+          },
+        }"
         class="flex items-center px-4 py-3 text-gray-300 transition-colors duration-200"
         :class="{
           'justify-center': isCollapsed,
